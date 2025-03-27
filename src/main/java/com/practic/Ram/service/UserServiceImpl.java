@@ -1,16 +1,21 @@
 package com.practic.Ram.service;
 
-import com.practic.Ram.entity.User;
+import com.practic.Ram.entity.BusUser;
+import com.practic.Ram.payload.UserDto;
 import com.practic.Ram.repository.UserRepo;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
-
-    private final UserRepo repo;
+    private final UserRepo repo;//new ProxyClass();
     private final ModelMapper modelMapper;
 
     public UserServiceImpl(UserRepo repo, ModelMapper modelMapper) {
@@ -21,18 +26,21 @@ public class UserServiceImpl implements UserService {
 
     //create
     @Override
-    public User createUser(User user) {
-        User saved = repo.save(user);
-        return saved;
-    }
+    public UserDto createUser(UserDto dto) {
+        BusUser map = modelMapper.map(dto, BusUser.class);
+        BusUser saved = repo.save(map);
+        UserDto map1 = modelMapper.map(saved, UserDto.class);
+        return map1;
 
+    }
     //GetByName
     @Override
-    public Optional<User> getByName(String nam) {
-        Optional<User> byName = repo.findByName(nam);
+    public Optional<UserDto> getByName(String name) {
+        Optional<BusUser> byName = repo.findByName(name);
         if (byName.isPresent()) {
-            User user = byName.get();
-            return Optional.of(user);
+            BusUser busUser = byName.get();
+            UserDto dto = modelMapper.map(busUser, UserDto.class);
+            return Optional.of(dto);
         } else {
             return Optional.empty();
         }
@@ -47,46 +55,70 @@ public class UserServiceImpl implements UserService {
 
     //update
     @Override
-    public User updateById(Long id, User user) {
-        Optional<User> byId = repo.findById(id);
-        User exitingUser = byId.get();
-//        exitingUser.setName(user.getName());
-//        exitingUser.setEmail(user.getEmail());
-//        exitingUser.setPassword(user.getPassword());
-//        exitingUser.setUsername(user.getUsername());
-        modelMapper.map(user, exitingUser);
-      exitingUser.setId(id);
-        User save1 = repo.save(exitingUser);
-        return save1;
+    public UserDto updateById(Long id, UserDto dto) {
+        Optional<BusUser> byId = repo.findById(id);
+        BusUser exitingBusUser = byId.get();
+//        exitingBusUser.setName(user.getName());
+//        exitingBusUser.setEmail(user.getEmail());
+//        exitingBusUser.setPassword(user.getPassword());
+//        exitingBusUser.setUsername(user.getUsername());
+        modelMapper.map(dto, exitingBusUser);
+      exitingBusUser.setId(id);
+        BusUser save1 = repo.save(exitingBusUser);
+        UserDto dto1 = modelMapper.map(save1, UserDto.class);
+        return dto1;
     }
 
     //patch
     @Override
-    public User partiallyUpdate(Long id,User user) {
-        Optional<User> byId = repo.findById(id);
-        User existingUser = byId.get();
+    public UserDto partiallyUpdate(Long id,UserDto dto) {
+        Optional<BusUser> byId = repo.findById(id);
+        BusUser existingBusUser = byId.get();
 //        if (user.getName()!=null){
-//            existingUser.setName(user.getName());
+//            existingBusUser.setName(user.getName());
 //        }
 //        if (user.getEmail()!=null){
-//            existingUser.setEmail(user.getEmail());
+//            existingBusUser.setEmail(user.getEmail());
 //        }
 //        if (user.getPassword()!=null){
-//            existingUser.setPassword(user.getPassword());
+//            existingBusUser.setPassword(user.getPassword());
 //        }
 //        if (user.getUsername()!=null){
-//            existingUser.setUsername(user.getUsername());
+//            existingBusUser.setUsername(user.getUsername());
 //        }
 
-        modelMapper.getConfiguration()
+        modelMapper.getConfiguration()   //set up the configuration for model mapper
                 .setSkipNullEnabled(true)   // ⿡ Skip null values
                 .setFieldMatchingEnabled(true) ; // ⿢ Match fields by name
 //                .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);  // ⿣ Access private fields
 
-        modelMapper.map(user,existingUser);
-//        existingUser.setId(id);
-        User save = repo.save(existingUser);
-        return save;
+        modelMapper.map(dto, existingBusUser);  //use se data get karega or existing me set karega
+//        existingBusUser.setId(id);
+        BusUser save = repo.save(existingBusUser);  //repo yaha pe save karega
+        UserDto dto2 = modelMapper.map(save, UserDto.class);
+        return dto2;
     }
+
+    @Override
+    public List<UserDto> getAll(int pageNo, int pageSize, String sortBy, String sortDirection) {  //
+
+        Sort sort = Sort.by(sortBy);
+
+        if (sortDirection.equalsIgnoreCase("desc")) {
+            sort = sort.descending();
+        } else {
+            sort = sort.ascending();
+        }
+
+//        Sort sort = sortDirection.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize, sort);
+        Page<BusUser> all = repo.findAll(pageRequest);
+        List<UserDto> collect = all.stream().map(user -> modelMapper.map(user, UserDto.class)).collect(Collectors.toList());
+        return collect;
+    }
+
+
+    //
 
 }

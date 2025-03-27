@@ -1,16 +1,28 @@
 package com.practic.Ram.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
+public class BusUser {
 
-public class User {
+    @GeneratedValue(strategy = GenerationType.IDENTITY)   //primary key
     @Id
     private Long id;
+
+    @Column(name = "name",nullable = false)
     private String name;
+
+
+    //candidate key - due to it is same as primary key, all the characteristic of primary key contains by candidate key.
+    @Column(name="username",nullable = false,unique = true)
     private String username;
+
+    @Column(name="password",nullable = false)
     private String password;
+
+
+    //candidate key - due to it is same as primary key, all the characteristic of primary key contains by candidate key.
+    @Column(name="email",nullable = false,unique = true)
     private String email;
 
     public Long getId() {

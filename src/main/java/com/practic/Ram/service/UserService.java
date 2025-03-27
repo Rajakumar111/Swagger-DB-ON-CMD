@@ -1,18 +1,21 @@
 package com.practic.Ram.service;
 
-import com.practic.Ram.entity.User;
+import com.practic.Ram.payload.UserDto;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
 
-    public User createUser(User user) ;
+    public UserDto createUser(UserDto dto) ;
 
-  Optional<User>  getByName(String nam);
+  Optional<UserDto>  getByName(String name);
 
   public void deleteById(Long id);
 
-   public User updateById(Long id, User user);
+   public UserDto updateById(Long id, UserDto dto);
 
-    public User partiallyUpdate(Long id,User user);
+    public UserDto partiallyUpdate(Long id,UserDto dto);
+
+    public List<UserDto> getAll(int pageNo, int pageSize, String sortBy, String sortDirection);
 }
