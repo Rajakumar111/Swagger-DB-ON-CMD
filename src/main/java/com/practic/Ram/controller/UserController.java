@@ -65,6 +65,9 @@ public class UserController {
        UserDto user1 = userService.partiallyUpdate(id, user);
        return new ResponseEntity<>(user1,HttpStatus.OK);
     }
-
-
+    @GetMapping("/getById/{id}")
+    public ResponseEntity<UserDto> getById(@PathVariable long id){
+        UserDto userDto = userService.getById(id);
+        return new ResponseEntity<>(userDto , HttpStatus.OK);
+    }
 }

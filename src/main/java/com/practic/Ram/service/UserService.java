@@ -18,4 +18,6 @@ public interface UserService {
     public UserDto partiallyUpdate(Long id,UserDto dto);
 
     public List<UserDto> getAll(int pageNo, int pageSize, String sortBy, String sortDirection);
+
+    UserDto getById(long id);
 }

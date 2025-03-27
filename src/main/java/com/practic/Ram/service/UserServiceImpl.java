@@ -1,6 +1,7 @@
 package com.practic.Ram.service;
 
 import com.practic.Ram.entity.BusUser;
+import com.practic.Ram.exception.ResourceNotFoundException;
 import com.practic.Ram.payload.UserDto;
 import com.practic.Ram.repository.UserRepo;
 import org.modelmapper.ModelMapper;
@@ -118,7 +119,15 @@ public class UserServiceImpl implements UserService {
         return collect;
     }
 
+    @Override
+    public UserDto getById(long id) {
+        BusUser busUser = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("id is not present" + id));
+        UserDto map = modelMapper.map(busUser, UserDto.class);
+        return map;
+    }
+
 
     //
+
 
 }
