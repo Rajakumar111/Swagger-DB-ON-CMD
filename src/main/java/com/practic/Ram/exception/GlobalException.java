@@ -32,7 +32,7 @@ public class GlobalException {
         ErrorDedails details = new ErrorDedails(
                 new Date(),
                 e.getMessage(),
-                request.getDescription(true)
+                request.getDescription(false)
         );
         return new ResponseEntity<>(details,HttpStatus.BAD_REQUEST);
     }
