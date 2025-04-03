@@ -1,5 +1,6 @@
 package com.practic.Ram.controller;
 
+import com.practic.Ram.payload.LoginDto;
 import com.practic.Ram.payload.UserDto;
 import com.practic.Ram.service.UserService;
 import jakarta.validation.Valid;
@@ -69,5 +70,13 @@ public class UserController {
     public ResponseEntity<UserDto> getById(@PathVariable long id){
         UserDto userDto = userService.getById(id);
         return new ResponseEntity<>(userDto , HttpStatus.OK);
+    }
+
+    //Verify Login
+@PostMapping("/verifyLogin")
+    public  ResponseEntity<String> verifyUser(@RequestBody LoginDto dto){
+        String s = userService.verifyUser(dto);
+        return new ResponseEntity<>(s,HttpStatus.OK);
+
     }
 }

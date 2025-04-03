@@ -16,6 +16,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalException {
 
+    //This is only for validation exception only
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -27,6 +28,8 @@ public class GlobalException {
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
+    //This is for global exception
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDedails> globalsExceptions(Exception e, WebRequest request){
         ErrorDedails details = new ErrorDedails(

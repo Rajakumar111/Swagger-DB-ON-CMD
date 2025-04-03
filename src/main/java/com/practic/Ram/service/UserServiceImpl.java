@@ -2,12 +2,14 @@ package com.practic.Ram.service;
 
 import com.practic.Ram.entity.BusUser;
 import com.practic.Ram.exception.ResourceNotFoundException;
+import com.practic.Ram.payload.LoginDto;
 import com.practic.Ram.payload.UserDto;
 import com.practic.Ram.repository.UserRepo;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,7 +30,12 @@ public class UserServiceImpl implements UserService {
     //create
     @Override
     public UserDto createUser(UserDto dto) {
+
+        
         BusUser map = modelMapper.map(dto, BusUser.class);
+        String hashpw = BCrypt.hashpw(map.getPassword(), BCrypt.gensalt(5));
+        map.setPassword(hashpw);
+        System.out.println(hashpw);
         BusUser saved = repo.save(map);
         UserDto map1 = modelMapper.map(saved, UserDto.class);
         return map1;
@@ -64,7 +71,7 @@ public class UserServiceImpl implements UserService {
 //        exitingBusUser.setPassword(user.getPassword());
 //        exitingBusUser.setUsername(user.getUsername());
         modelMapper.map(dto, exitingBusUser);
-      exitingBusUser.setId(id);
+        exitingBusUser.setId(id);
         BusUser save1 = repo.save(exitingBusUser);
         UserDto dto1 = modelMapper.map(save1, UserDto.class);
         return dto1;
@@ -93,7 +100,7 @@ public class UserServiceImpl implements UserService {
                 .setFieldMatchingEnabled(true) ; // ⿢ Match fields by name
 //                .setFieldAccessLevel(org.modelmapper.config.Configuration.AccessLevel.PRIVATE);  // ⿣ Access private fields
 
-        modelMapper.map(dto, existingBusUser);  //use se data get karega or existing me set karega
+        modelMapper.map(dto, existingBusUser);  //user se data get karega or existing me set karega
 //        existingBusUser.setId(id);
         BusUser save = repo.save(existingBusUser);  //repo yaha pe save karega
         UserDto dto2 = modelMapper.map(save, UserDto.class);
@@ -126,8 +133,18 @@ public class UserServiceImpl implements UserService {
         return map;
     }
 
-
-    //
-
-
+    @Override
+    public String verifyUser(LoginDto dto) {
+        Optional<BusUser> byUserName = repo.findByUsername(dto.getUsername());
+        if(byUserName.isPresent()){
+            BusUser busUser = byUserName.get();
+            if(BCrypt.checkpw(dto.getPassword(), busUser.getPassword())){
+                return "Login Successful";
+            } else {
+                return "cridentials Wrong Please Check Username or Password";
+            }
+        } else {
+            return "User not found";
+        }
+    }
 }
